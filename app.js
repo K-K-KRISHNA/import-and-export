@@ -128,6 +128,7 @@ app.get("/todos/:todoId/", checkRequestInBody, async (request, response) => {
   const item = await db.get(dbQuery);
   response.send(DbObjToResObj(item));
 });
+
 app.post("/todos/", checkRequestInBody, async (request, response) => {
   const {
     id = "",
@@ -173,6 +174,7 @@ app.put("/todos/:todoId/", checkRequestInBody, async (request, response) => {
     response.send("Todo Updated");
   }
 });
+
 app.delete("/todos/:todoId/", async (request, response) => {
   const { todoId } = request.params;
   const dbQuery = `
@@ -181,19 +183,16 @@ app.delete("/todos/:todoId/", async (request, response) => {
   response.send(`Todo Deleted`);
 });
 
-function stringToDate(given) {
-  let temp = new Date(given);
-  let result = time.format(temp, "yyyy-MM-dd");
-  return result;
-}
-
 app.get("/agenda/", async (request, response) => {
   const { date } = request.query;
-  let dateObj = stringToDate(date);
+  const duedate = changeDate(date);
+  const dueDate = "2021-04-02";
   const dbQuery = `
-  SELECT * FROM todo WHERE
-  due_date = ${dateObj};`;
+  SELECT * FROM todo WHERE due_date='${date}';
+  `;
   const array = await db.all(dbQuery);
-  response.send(array.map((item) => DbObjToResObj(item)));
+  const modifiedArray = array.map((each) => DbObjToResObj(each));
+  response.send(modifiedArray);
 });
+
 module.exports = app;
